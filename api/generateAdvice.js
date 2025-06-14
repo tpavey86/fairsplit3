@@ -9,6 +9,9 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Missing input' });
   }
 
+  // ✅ Debug line 1 – check if API key is available
+  console.log("Calling OpenAI with key:", process.env.OPENAI_API_KEY ? "PRESENT" : "MISSING");
+
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -48,6 +51,10 @@ Please keep the entire response under 1000 words.`
     });
 
     const data = await response.json();
+
+    // ✅ Debug line 2 – log OpenAI's raw response
+    console.log("OpenAI response raw:", data);
+
     if (data.choices && data.choices.length > 0) {
       return res.status(200).json({ reply: data.choices[0].message.content });
     } else {
