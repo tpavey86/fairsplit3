@@ -55,31 +55,36 @@
     <button type="submit">Submit</button>
   </form>
   <div class="output" id="advice"></div>
-  <script>
-    document.getElementById('intakeForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const form = e.target;
-      const formData = new FormData(form);
-      const entries = [...formData.entries()].map(([key, value]) => `${key.replace(/_/g, ' ')}: ${value}`);
-      const summary = entries.join("\n");
-      const outputDiv = document.getElementById('advice');
-      outputDiv.textContent = 'Generating advice... please wait...';
-      try {
-        const response = await fetch("/api/generateAdvice", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userMessage: summary })
-        });
-        const data = await response.json();
-        if (data.reply) {
-          outputDiv.textContent = data.reply;
-        } else {
-          outputDiv.textContent = "Error: Could not generate advice. Please try again later.";
-        }
-      } catch (error) {
-        outputDiv.textContent = "Error: Unable to connect to the AI service. Please try again later.";
+ <script>
+  document.getElementById('intakeForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+    const entries = [...formData.entries()].map(([key, value]) => `${key}: ${value}`);
+    const summary = entries.join("\n");
+
+    const outputDiv = document.getElementById('advice');
+    outputDiv.textContent = 'Generating advice... please wait...';
+
+    try {
+      const response = await fetch('/api/generateAdvice', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ userMessage: summary })
+      });
+
+      const data = await response.json();
+
+      if (data.reply) {
+        outputDiv.textContent = data.reply;
+      } else {
+        outputDiv.textContent = 'Error: No reply from AI.';
       }
-    });
-  </script>
-</body>
-</html>
+    } catch (error) {
+      outputDiv.textContent = 'Error contacting AI service.';
+    }
+  });
+</script>
+
